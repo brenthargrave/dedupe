@@ -1,0 +1,5 @@
+# default gemset
+rvm 1.9.2@dedupe
+
+# return to system ruby on leaving directory
+rvm_project_rvmrc_default=1

@@ -1,9 +1,77 @@
 = dedupe
 
-Description goes here.
+
+== Description
+
+Dedupe provides Mongoid and ActiveRecord 3 with a uniqueness validation that protects your datastore from duplicate records, defined by your domain.
+
+The following model defines a uniqueness constraint:
+  
+  class Model
+    include Mongoid::Document
+    
+    field :foo
+    field :bar
+    field :baz
+    
+    validates_uniqueness :using => :with_matching_foo_and_bar
+    scope :with_matching_foo_and_bar, lambda { |instance|
+      where :foo => instance.foo, :bar => instance.bar
+      # our hypothetical domain requires that we disregard :baz
+    }
+    
+  end
+
+Any attempt to save a record with the same "foo" and "bar" values will fail.
+
+  > existing = Model.create! :foo => "a", :bar => "b", :baz => "c"
+  => #<Model _id: 123abc, foo: "a", bar: "b", baz: "c">
+   
+  > duplicate = Model.new :foo => "a", :bar => "b", :baz => "z"
+  => #<Model _id: 456def, foo: "a", bar: "b", baz: "z">
+  
+  > duplicate.valid?
+  => false
+  
+  > duplicate.errors.full_messages
+  => ["Duplicates existing record"]
+  
+  > duplicate.save!
+  Mongoid::Errors::Validations: Validation failed...
+
+The gem also provides a few other methods, possibly useful for cleaning up datastores already corrupted with duplicate records.
+  
+  > duplicate.duplicate?
+  => true
+  
+  > duplicate.duplicates.to_a
+  => [#<Model _id: 123abc, foo: "a", bar: "b", baz: "c">]
+  
+  > existing.duplicates.to_a
+  => []
+
+
+== Installation & Usage
+
+Add the gem to your Gemfile:
+  gem 'dedupe'
+
+Add a scope or "finder" method to your model that a) accepts an instance of your model and b) returns a relation/criterion that would select all duplicate instances in your datastore.  In the above example, this method is:
+  scope :with_matching_foo_and_bar, lambda { |instance| 
+    where :foo => instance.foo, :baz => instance.baz
+  }
+
+But you could also define:
+  def with_matching_foo_and_bar(instance)
+    where :foo => instance.foo, :baz => instance.baz
+  end
+
+Then, mix the Dedupe module into your model using the "validates_uniqueness" macro, passing it the name of your scope/finder:
+  validates_uniqueness :using => :with_matching_foo_and_bar
+
 
 == Note on Patches/Pull Requests
- 
+
 * Fork the project.
 * Make your feature addition or bug fix.
 * Add tests for it. This is important so I don't break it in a
