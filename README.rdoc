@@ -70,6 +70,14 @@ Then, mix the Dedupe module into your model using the "validates_uniqueness" mac
   validates_uniqueness :using => :with_matching_foo_and_bar
 
 
+== Note on require-order issues
+
+Dedupe doesn't declare a dependency on Mongoid or ActiveRecord because it can be used with either individually or both simultaneously.  Therefore, they must be required *before* Dedupe for it to work.  I haven't had trouble with this, but if you do please create an issue here: http://github.com/jamescallmebrent/dedupe/issues
+
+Check out this post by Yehuda Katz for more about require-order problems:
+http://yehudakatz.com/2010/04/17/ruby-require-order-problems/
+
+
 == Note on Patches/Pull Requests
 
 * Fork the project.
