@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = "dedupe"
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Brent Hargrave"]
-  s.date = "2012-06-07"
+  s.date = "2012-06-09"
   s.description = "ActiveModel validation against duplicating records."
   s.email = "brent.hargrave@gmail.com"
   s.extra_rdoc_files = [
